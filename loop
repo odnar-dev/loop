@@ -1,0 +1,31 @@
+#!/usr/bin/env sh
+
+LOOP_INTERVAL="3s"
+LOOP_LIMITE=0
+
+usage(){
+    echo "usage: loop [-l LOOP_LIMITE] [-t LOOP_INTERVAL] COMMAND..."
+    exit 0
+}
+
+[ -z "$1" ] && usage
+
+while [ "$1" ]; do
+    case "$1" in
+        "-h"|"--help")   usage ;;
+        "-l"|"--limite") LOOP_LIMITE="$2"  ; shift 2 ;;
+        "-t"|"--time")   LOOP_INTERVAL="$2"; shift 2 ;;
+        *)  break ;;
+    esac
+done
+
+count=1
+while true; do
+    clear
+    echo "round : $count"
+    $@
+    [ $LOOP_LIMITE -eq $count ] && exit
+    echo "sleeping $LOOP_INTERVAL"
+    sleep $LOOP_INTERVAL
+    count=$((count+1))
+done
