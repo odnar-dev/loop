@@ -23,7 +23,7 @@ count=1
 while true; do
     clear
     echo "round : $count"
-    $@
+    "$@"
     [ $LOOP_LIMITE -eq $count ] && exit
     echo "sleeping $LOOP_INTERVAL"
     sleep $LOOP_INTERVAL
