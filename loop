@@ -2,22 +2,38 @@
 
 LOOP_INTERVAL="3s"
 LOOP_LIMITE=0
+LOOP_TIMER=0
 
 usage(){
-    echo "usage: loop [-l LOOP_LIMITE] [-t LOOP_INTERVAL] COMMAND..."
+    echo "usage: loop [-l LOOP_LIMITE] [-i LOOP_INTERVAL] [-t LOOP_TIMER] COMMAND..."
     exit 0
+}
+
+toSs(){
+    while [ "$1" ]; do
+        case "$1" in
+            *m) seconds=$(($seconds+${1::-1}*60)) ; shift ;;
+            *mn)seconds=$(($seconds+${1::-2}*60)) ; shift ;;
+            *s) seconds=$(($seconds+${1::-1}))    ; shift ;;
+            *h)seconds=$(($seconds+${1::-1}*3600)); shift ;;
+        esac
+    done
+    echo $seconds
 }
 
 while [ "$1" ]; do
     case "$1" in
-        "-h"|"--help")   usage ;;
-        "-l"|"--limite") LOOP_LIMITE="$2"  ; shift 2 ;;
-        "-t"|"--time")   LOOP_INTERVAL="$2"; shift 2 ;;
+        "-h"|"--help") usage ;;
+        "-t"|"--timer") LOOP_TIMER=$(toSs $2) ; shift 2 ;;
+        "-l"|"--limite")   LOOP_LIMITE="$2"   ; shift 2 ;;
+        "-i"|"--interval") LOOP_INTERVAL="$2" ; shift 2 ;;
         *)  break ;;
     esac
 done
 
 [ -z "$1" ] && usage
+
+[ $LOOP_TIMER == 0 ] || enddate=$((`date +%s` + "$LOOP_TIMER"));
 
 count=1
 while true; do
@@ -25,6 +41,7 @@ while true; do
     echo "round : $count"
     "$@"
     [ $LOOP_LIMITE -eq $count ] && exit
+    [ $LOOP_TIMER == 0 ] || { [ "${enddate}" -le $(date +%s) ] && exit; }
     echo "sleeping $LOOP_INTERVAL"
     sleep $LOOP_INTERVAL
     count=$((count+1))
