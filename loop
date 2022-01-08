@@ -6,7 +6,7 @@ LOOP_TIMER=0
 LOOP_STYLE="TIME"
 
 usage(){
-    echo "usage: loop [-l LOOP_LIMITE] [-i LOOP_INTERVAL] [-t LOOP_TIMER] [-d] COMMAND..."
+    echo "usage: loop [-l LOOP_LIMITE] [-i LOOP_INTERVAL] [-t LOOP_TIMER] [-f LOOP_FILE] [-d] COMMAND..."
     exit 0
 }
 
