@@ -3,9 +3,10 @@
 LOOP_INTERVAL="3s"
 LOOP_LIMITE=0
 LOOP_TIMER=0
+LOOP_STYLE="TIME"
 
 usage(){
-    echo "usage: loop [-l LOOP_LIMITE] [-i LOOP_INTERVAL] [-t LOOP_TIMER] COMMAND..."
+    echo "usage: loop [-l LOOP_LIMITE] [-i LOOP_INTERVAL] [-t LOOP_TIMER] [-d] COMMAND..."
     exit 0
 }
 
@@ -21,28 +22,59 @@ toSs(){
     echo $seconds
 }
 
+loop_over_file(){
+    echo later
+}
+
+loop_over_dirs(){
+    for dir in *; do
+        [ -d "$dir" ] || continue
+        cd "$dir"
+        echo "Directorie : $dir"
+        "$@"
+        cd ..
+    done
+}
+
+loop_over_time(){
+    [ $LOOP_TIMER == 0 ] || enddate=$((`date +%s` + "$LOOP_TIMER"));
+    count=1
+    while true; do
+        clear
+        echo "round : $count"
+        "$@"
+        [ $LOOP_LIMITE -eq $count ] && exit
+        [ $LOOP_TIMER == 0 ] || { [ "${enddate}" -le $(date +%s) ] && exit; }
+        echo "sleeping $LOOP_INTERVAL"
+        sleep $LOOP_INTERVAL
+        count=$((count+1))
+    done
+}
+
 while [ "$1" ]; do
     case "$1" in
         "-h"|"--help") usage ;;
         "-t"|"--timer") LOOP_TIMER=$(toSs $2) ; shift 2 ;;
         "-l"|"--limite")   LOOP_LIMITE="$2"   ; shift 2 ;;
         "-i"|"--interval") LOOP_INTERVAL="$2" ; shift 2 ;;
+        "-d"|"--dirs") LOOP_STYLE="DIRS" ; shift 1 ;;
+#       "-f"|"--file") LOOP_STYLE="FILE" ; shift 2 ;;
+        "--") shift; break ;;
         *)  break ;;
     esac
 done
 
 [ -z "$1" ] && usage
 
-[ $LOOP_TIMER == 0 ] || enddate=$((`date +%s` + "$LOOP_TIMER"));
+case "$LOOP_STYLE" in
+    "TIME")
+        loop_over_time $*
+        ;;
+#   "FILE")
+#       loop_over_file $*
+#       ;;
+    "DIRS")
+        loop_over_dirs $*
+        ;;
+esac
 
-count=1
-while true; do
-    clear
-    echo "round : $count"
-    "$@"
-    [ $LOOP_LIMITE -eq $count ] && exit
-    [ $LOOP_TIMER == 0 ] || { [ "${enddate}" -le $(date +%s) ] && exit; }
-    echo "sleeping $LOOP_INTERVAL"
-    sleep $LOOP_INTERVAL
-    count=$((count+1))
-done
