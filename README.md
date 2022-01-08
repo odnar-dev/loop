@@ -3,7 +3,7 @@ cause sometimes i need to run stuff in loop
 
 ## Usage:
 ```
-loop [-l LOOP_LIMITE] [-i LOOP_INTERVAL] [-t LOOP_TIMER] COMMAND...
+usage: loop [-l LOOP_LIMITE] [-i LOOP_INTERVAL] [-t LOOP_TIMER] [-f LOOP_FILE] [-d] COMMAND...
 ```
 
 ## Examples
