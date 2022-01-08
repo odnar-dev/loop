@@ -23,7 +23,9 @@ toSs(){
 }
 
 loop_over_file(){
-    echo later
+    while IFS= read -r line || [ -n "$line" ]; do
+        "$@" "$line"
+    done < "$LOOP_FILE"
 }
 
 loop_over_dirs(){
@@ -58,7 +60,7 @@ while [ "$1" ]; do
         "-l"|"--limite")   LOOP_LIMITE="$2"   ; shift 2 ;;
         "-i"|"--interval") LOOP_INTERVAL="$2" ; shift 2 ;;
         "-d"|"--dirs") LOOP_STYLE="DIRS" ; shift 1 ;;
-#       "-f"|"--file") LOOP_STYLE="FILE" ; shift 2 ;;
+        "-f"|"--file") LOOP_STYLE="FILE" ; LOOP_FILE="$2" ; shift 2 ;;
         "--") shift; break ;;
         *)  break ;;
     esac
@@ -70,9 +72,9 @@ case "$LOOP_STYLE" in
     "TIME")
         loop_over_time $*
         ;;
-#   "FILE")
-#       loop_over_file $*
-#       ;;
+    "FILE")
+        loop_over_file $*
+        ;;
     "DIRS")
         loop_over_dirs $*
         ;;
